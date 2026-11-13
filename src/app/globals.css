@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+/* Fargetokens – lys og mørk modus følgjer systemet */
+:root {
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --border: #e4dfd5;
+  --text: #1f1d1a;
+  --muted: #6f6a60;
+  --accent: #2f5d50;
+  --accent-text: #ffffff;
+  --danger: #b3261e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161514;
+    --surface: #211f1d;
+    --border: #38342f;
+    --text: #f1eee8;
+    --muted: #a39d92;
+    --accent: #7fc4ae;
+    --accent-text: #10201b;
+    --danger: #ff8a80;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Gjenbrukte skjema-/knappestilar (16px tekst hindrar auto-zoom på iOS) */
+@utility field {
+  @apply w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-base text-text outline-none placeholder:text-muted focus:border-accent focus:ring-2 focus:ring-accent/25;
+}
+@utility btn {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition active:scale-[0.98] disabled:opacity-50;
+}
+@utility btn-primary {
+  @apply btn bg-accent text-accent-text hover:opacity-90;
+}
+@utility btn-ghost {
+  @apply btn border border-border bg-surface text-text hover:bg-bg;
+}
+@utility card {
+  @apply rounded-2xl border border-border bg-surface;
+}
+
+dialog::backdrop {
+  background: rgb(0 0 0 / 0.45);
+}
