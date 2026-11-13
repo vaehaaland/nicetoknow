@@ -2,9 +2,17 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { deleteEntry, saveEntry, type ActionResult } from "@/app/(app)/actions";
-import { CATEGORIES, CATEGORY_IDS, type CategoryId, type Entry } from "@/lib/entries";
+import { CATEGORIES, CATEGORY_IDS, memberName, type CategoryId, type Entry, type Member } from "@/lib/entries";
 
-type Props = { entry: Entry | null; defaultCategory: CategoryId; onClose: () => void };
+type Props = {
+  entry: Entry | null;
+  defaultCategory: CategoryId;
+  defaultParentId?: string; // sett når ein legg til ein fordel frå eit medlemskap
+  memberships: Entry[]; // medlemskapa ein fordel kan høyre til
+  members: Member[];
+  currentUserId: string;
+  onClose: () => void;
+};
 
 // Etikett + felt med lik utforming
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -17,7 +25,9 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 // Modal for å opprette (entry = null) eller redigere ei oppføring
-export function EntryForm({ entry, defaultCategory, onClose }: Props) {
+export function EntryForm({ entry, defaultCategory, defaultParentId, memberships, members, currentUserId, onClose }: Props) {
+  // Ei oppføring kan ikkje høyre til seg sjølv
+  const parentOptions = memberships.filter((membership) => membership.id !== entry?.id);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [category, setCategory] = useState<CategoryId>(entry?.category ?? defaultCategory);
   const [error, setError] = useState<string>();
@@ -79,6 +89,30 @@ export function EntryForm({ entry, defaultCategory, onClose }: Props) {
         <Field label={config.codeLabel}>
           <input className="field font-mono" name="code" defaultValue={entry?.code ?? ""} autoCapitalize="none" autoCorrect="off" spellCheck={false} />
         </Field>
+        <div className="grid gap-3.5 sm:grid-cols-2">
+          <Field label="Gjeld">
+            <select className="field" name="owner_id" defaultValue={entry?.owner_id ?? ""}>
+              <option value="">Felles</option>
+              {members.map((member) => (
+                <option key={member.user_id} value={member.user_id}>
+                  {memberName(member, currentUserId)}
+                </option>
+              ))}
+            </select>
+          </Field>
+          {parentOptions.length > 0 && (
+            <Field label="Fordel via medlemskap">
+              <select className="field" name="parent_id" defaultValue={entry?.parent_id ?? defaultParentId ?? ""}>
+                <option value="">Ingen</option>
+                {parentOptions.map((membership) => (
+                  <option key={membership.id} value={membership.id}>
+                    {membership.title}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          )}
+        </div>
         <div className="grid gap-3.5 sm:grid-cols-2">
           <Field label={config.dateLabel}>
             <input className="field" type="date" name="expires_at" defaultValue={entry?.expires_at ?? ""} />

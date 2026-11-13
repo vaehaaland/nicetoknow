@@ -13,12 +13,22 @@ export type Entry = {
   notes: string | null;
   expires_at: string | null; // ISO-dato (YYYY-MM-DD)
   tags: string[];
+  parent_id: string | null; // medlemskapet ein fordel høyrer til
+  owner_id: string | null; // kven det gjeld; null = felles
   updated_at: string;
 };
 
+// Medlem i husstanden med profil
+export type Member = { user_id: string; display_name: string | null; avatar: string | null };
+export const MEMBER_COLUMNS = "user_id, display_name, avatar";
+
+// Namn å vise for eit medlem – med fallback til «Meg»/«Partnar» før namnet er sett
+export const memberName = (member: Member, currentUserId: string) =>
+  member.display_name ?? (member.user_id === currentUserId ? "Meg" : "Partnar");
+
 // Kolonnane appen les – held select-spørjingane like overalt
 export const ENTRY_COLUMNS =
-  "id, category, title, provider, code, url, notes, expires_at, tags, updated_at";
+  "id, category, title, provider, code, url, notes, expires_at, tags, parent_id, owner_id, updated_at";
 
 type CategoryConfig = {
   label: string; // namn i fleirtal (filter)
@@ -75,8 +85,9 @@ export function daysUntil(iso: string, today: string) {
   return Math.round((Date.parse(iso) - Date.parse(today)) / 86_400_000);
 }
 
-// Fritekstsøk: alle orda i søket må finnast ein stad i oppføringa
-export function matchesQuery(entry: Entry, query: string) {
+// Fritekstsøk: alle orda i søket må finnast ein stad i oppføringa.
+// `extra` er tekst utanfor sjølve oppføringa, t.d. namnet på medlemskapet og eigaren.
+export function matchesQuery(entry: Entry, query: string, extra: (string | undefined)[] = []) {
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   if (words.length === 0) return true;
   const haystack = [
@@ -87,6 +98,7 @@ export function matchesQuery(entry: Entry, query: string) {
     entry.url,
     CATEGORIES[entry.category].singular,
     ...entry.tags,
+    ...extra,
   ]
     .filter(Boolean)
     .join(" ")

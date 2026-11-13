@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { MEMBER_COLUMNS, type Member } from "@/lib/entries";
 import { createClient, getUserId } from "@/lib/supabase/server";
 
 export type Household = { id: string; name: string; invite_code: string };
@@ -15,6 +16,16 @@ export async function getSessionContext() {
     .maybeSingle<Household>();
 
   return { supabase, userId, household };
+}
+
+// Medlemmene i eigen husstand (RLS avgrensar), eldste først
+export async function getMembers(supabase: Awaited<ReturnType<typeof createClient>>) {
+  const { data } = await supabase
+    .from("household_members")
+    .select(MEMBER_COLUMNS)
+    .order("joined_at")
+    .returns<Member[]>();
+  return data ?? [];
 }
 
 // Som over, men krev at brukaren har ein husstand

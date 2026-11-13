@@ -8,6 +8,8 @@ som er kjekt å ha – med raskt søk og ein Claude-chat som kan slå opp i alt 
 - **Oversikt** (`/`): fritekstsøk, kategorifilter, kopier-knapp på kodar, varsel om utløp/fornying.
 - **Spør Claude** (`/chat`): chat som får oppføringane dykkar som kontekst og svarar ut frå dei.
 - **Innstillingar** (`/innstillingar`): invitasjonskode til partnaren, namn på husstanden, logg ut.
+- **Fordelar og eigar**: ei oppføring kan høyre til eit medlemskap («Via Fagforeininga») og gjelde
+  éin av dykk eller vere felles. Kvar brukar har namn og profilbilete.
 - **Deling**: kvar brukar høyrer til éin *husstand*. Row Level Security i Postgres gjer at berre
   medlemmer ser og endrar oppføringane.
 
@@ -17,8 +19,9 @@ Next.js 16 (App Router, TypeScript) · Tailwind CSS 4 · Supabase (Auth + Postgr
 
 ## Kome i gang
 
-1. **Supabase**: opprett eit prosjekt og køyr `supabase/migrations/20261113120000_init.sql`
-   (SQL Editor, eller `supabase db push`).
+1. **Supabase**: opprett eit prosjekt og køyr filene i `supabase/migrations/` i rekkjefølgje
+   (SQL Editor, eller `supabase db push`). Nye migreringar må køyrast *før* koden som brukar dei
+   blir rulla ut.
 2. **Miljøvariablar**: kopier `.env.example` til `.env.local` og fyll inn verdiane.
    `ANTHROPIC_API_KEY` er valfri – utan han er alt unnateke chatten i bruk.
 3. **Køyr**:
