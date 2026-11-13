@@ -17,7 +17,11 @@ export function Chat() {
   const [busy, setBusy] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => bottomRef.current?.scrollIntoView({ block: "end" }), [messages]);
+  // Blokk-kropp med vilje: scrollIntoView returnerer eit Promise i nyare nettlesarar,
+  // og ein effekt må ikkje returnere noko anna enn ein oppryddingsfunksjon.
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ block: "end" });
+  }, [messages]);
 
   // Legg tekst til den siste (assistent-)meldinga
   const appendToLast = (text: string) =>

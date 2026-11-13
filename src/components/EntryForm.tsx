@@ -24,7 +24,9 @@ export function EntryForm({ entry, defaultCategory, onClose }: Props) {
   const [pending, startTransition] = useTransition();
   const config = CATEGORIES[category];
 
-  useEffect(() => dialogRef.current?.showModal(), []);
+  useEffect(() => {
+    dialogRef.current?.showModal();
+  }, []);
 
   // Køyrer ei server-handling og lukkar modalen når ho lukkast
   const run = (action: () => Promise<ActionResult>) =>
