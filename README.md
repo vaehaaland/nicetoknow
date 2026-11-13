@@ -30,9 +30,29 @@ Next.js 16 (App Router, TypeScript) · Tailwind CSS 4 · Supabase (Auth + Postgr
 
 4. Opprett konto, lag ein husstand, og del invitasjonskoden under *Innstillingar* med partnaren.
 
-Ved utrulling (t.d. Vercel): legg inn dei same miljøvariablane, og set *Site URL* og
-`https://<domene>/auth/callback` under **Authentication → URL Configuration** i Supabase slik at
-lenkja i stadfestings-e-posten fungerer.
+## Utrulling til Vercel
+
+Appen treng ingen eigen Vercel-konfigurasjon – Next.js blir oppdaga automatisk.
+
+1. Gå til [vercel.com/new](https://vercel.com/new) og importer GitHub-repoet `nicetoknow`.
+2. Legg inn miljøvariablane under **Environment Variables** (Production og Preview):
+
+   | Namn | Verdi |
+   | --- | --- |
+   | `NEXT_PUBLIC_SUPABASE_URL` | `https://<prosjekt-ref>.supabase.co` |
+   | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_…` |
+   | `ANTHROPIC_API_KEY` | API-nøkkel frå Claude Console (marker som *Sensitive*) |
+   | `ANTHROPIC_MODEL` | valfri, t.d. `claude-haiku-5-5` |
+
+3. Trykk **Deploy**. Vercel byggjer produksjon frå `main` og ei førehandsvising for kvar pull request.
+4. I Supabase, under **Authentication → URL Configuration**:
+   - set **Site URL** til produksjonsadressa, t.d. `https://nicetoknow.vercel.app`
+   - legg `https://nicetoknow.vercel.app/auth/callback` til under **Redirect URLs**
+
+   Utan dette peikar lenkja i stadfestings-e-posten til `localhost`.
+5. Opprett konto på produksjonsadressa, lag husstanden og del invitasjonskoden med partnaren.
+
+`NEXT_PUBLIC_`-variablane blir bakte inn ved bygging, så endrar du dei må du rulle ut på nytt.
 
 ## Struktur
 
