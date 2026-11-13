@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { CATEGORIES, ENTRY_COLUMNS, type Entry } from "@/lib/entries";
+import { CATEGORIES, ENTRY_COLUMNS, type Entry, type Member } from "@/lib/entries";
+import { getMembers } from "@/lib/household";
 import { createClient, getUserId } from "@/lib/supabase/server";
 
 // Lange svar kan strøyme ei stund
@@ -34,8 +35,11 @@ function parseMessages(body: unknown): ChatMessage[] | null {
 }
 
 // Kompakt, stabil tekstversjon av oppføringane (stabil rekkjefølgje → prompt-cache treff)
-function describeEntries(entries: Entry[]) {
+function describeEntries(entries: Entry[], members: Member[]) {
   if (entries.length === 0) return "(Ingen oppføringar er lagra enno.)";
+  const titleOf = new Map(entries.map((e) => [e.id, e.title]));
+  // Ikkje «Meg»/«Partnar» her: teksten må vere lik og eintydig for begge brukarane
+  const nameOf = new Map(members.map((m) => [m.user_id, m.display_name ?? "medlem utan namn"]));
   return entries
     .map((e) => {
       const config = CATEGORIES[e.category];
@@ -43,6 +47,8 @@ function describeEntries(entries: Entry[]) {
         ["Kategori", config.singular],
         ["Tittel", e.title],
         ["Leverandør", e.provider],
+        ["Gjeld", e.owner_id ? (nameOf.get(e.owner_id) ?? null) : "Felles"],
+        ["Fordel via medlemskap", e.parent_id ? (titleOf.get(e.parent_id) ?? null) : null],
         [config.codeLabel, e.code],
         [config.dateLabel, e.expires_at],
         ["Lenkje", e.url],
@@ -67,12 +73,10 @@ export async function POST(request: Request) {
   if (!messages) return plain("Ugyldig førespurnad.", 400);
 
   // RLS avgrensar til eigen husstand
-  const { data: entries } = await supabase
-    .from("entries")
-    .select(ENTRY_COLUMNS)
-    .order("created_at")
-    .order("id")
-    .returns<Entry[]>();
+  const [{ data: entries }, members] = await Promise.all([
+    supabase.from("entries").select(ENTRY_COLUMNS).order("created_at").order("id").returns<Entry[]>(),
+    getMembers(supabase),
+  ]);
 
   const stream = new Anthropic().beta.messages.stream({
     model: MODEL,
@@ -86,7 +90,7 @@ export async function POST(request: Request) {
       // Stabilt prefiks (instruksar + oppføringar) blir cacha; datoen kjem etter brotpunktet
       {
         type: "text",
-        text: `${INSTRUCTIONS}\n\n<oppforingar>\n${describeEntries(entries ?? [])}\n</oppforingar>`,
+        text: `${INSTRUCTIONS}\n\n<oppforingar>\n${describeEntries(entries ?? [], members)}\n</oppforingar>`,
         cache_control: { type: "ephemeral" },
       },
       { type: "text", text: `Dato i dag: ${new Date().toISOString().slice(0, 10)}.` },
