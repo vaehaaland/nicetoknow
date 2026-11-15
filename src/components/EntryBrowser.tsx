@@ -182,7 +182,7 @@ export function EntryBrowser({ entries, members, currentUserId, today }: Props) 
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Søk i kodar, ting, mål, notat …"
+          placeholder="Søk i kodar, ting, notat …"
           aria-label="Søk"
           className="field"
         />

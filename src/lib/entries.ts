@@ -1,6 +1,6 @@
 // Datamodell + kategori-konfig. Éi kjelde til sanning for skjema, kort og chat.
 
-export const CATEGORY_IDS = ["discount", "membership", "insurance", "product", "measurement", "other"] as const;
+export const CATEGORY_IDS = ["discount", "membership", "insurance", "product", "note", "other"] as const;
 export type CategoryId = (typeof CATEGORY_IDS)[number];
 
 export type Entry = {
@@ -80,13 +80,13 @@ export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
     titleHint: "Dr. Martens 1460",
     badge: "bg-violet-100 text-violet-900 dark:bg-violet-900/40 dark:text-violet-200",
   },
-  measurement: {
-    label: "Mål",
-    singular: "Mål",
-    icon: "📏",
-    codeLabel: "Mål / storleik",
+  note: {
+    label: "Kjekt å vite",
+    singular: "Kjekt å vite",
+    icon: "💡",
+    codeLabel: "Detalj / verdi",
     dateLabel: null,
-    titleHint: "Skostorleik",
+    titleHint: "Veggmåling i stova",
     badge: "bg-rose-100 text-rose-900 dark:bg-rose-900/40 dark:text-rose-200",
   },
   other: {
