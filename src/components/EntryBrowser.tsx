@@ -18,6 +18,40 @@ import { EntryForm } from "./EntryForm";
 
 type Filter = CategoryId | "all";
 const EXPIRY_WARNING_DAYS = 30;
+const EXPIRED_GRACE_DAYS = 30; // kor lenge noko utgått blir ståande i «Skjer snart»
+
+// «om 3 dagar», «i dag», «for 2 dagar sidan»
+const relativeDays = (days: number) =>
+  days === 0 ? "i dag" : days === 1 ? "i morgon" : days > 0 ? `om ${days} dagar` : days === -1 ? "i går" : `for ${-days} dagar sidan`;
+
+// Stripe øvst: det som går ut, fornyast eller mistar garantien snart (eller nett har gjort det)
+function UpcomingStrip({ entries, today, onShow }: { entries: Entry[]; today: string; onShow: (title: string) => void }) {
+  const upcoming = entries
+    .flatMap((entry) => (entry.expires_at ? [{ entry, days: daysUntil(entry.expires_at, today) }] : []))
+    .filter(({ days }) => days <= EXPIRY_WARNING_DAYS && days >= -EXPIRED_GRACE_DAYS)
+    .sort((a, b) => a.days - b.days);
+  if (upcoming.length === 0) return null;
+
+  return (
+    <section aria-label="Skjer snart" className="card flex flex-col gap-1 px-4 py-3">
+      <h2 className="text-xs font-semibold text-muted">⏰ Skjer snart</h2>
+      <ul className="flex flex-col">
+        {upcoming.map(({ entry, days }) => (
+          <li key={entry.id}>
+            <button onClick={() => onShow(entry.title)} className="flex w-full items-baseline justify-between gap-3 py-1 text-left text-sm">
+              <span className="min-w-0 truncate">
+                {CATEGORIES[entry.category].icon} {entry.title}
+              </span>
+              <span className={`shrink-0 text-xs font-medium ${days < 0 ? "text-danger" : "text-amber-700 dark:text-amber-300"}`}>
+                {days < 0 ? "Utgått" : CATEGORIES[entry.category].dateLabel} {relativeDays(days)}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
 
 // Merkelapp for utløp/fornying: raud når passert, gul når det nærmar seg
 function ExpiryBadge({ entry, today }: { entry: Entry; today: string }) {
@@ -206,6 +240,9 @@ export function EntryBrowser({ entries, members, currentUserId, today }: Props) 
           </button>
         ))}
       </div>
+
+      {/* Berre i den ufiltrerte oversikta, så stripa ikkje står i vegen for eit søk */}
+      {!query && filter === "all" && <UpcomingStrip entries={entries} today={today} onShow={show} />}
 
       {visible.length > 0 ? (
         <ul className="grid gap-3 sm:grid-cols-2">
