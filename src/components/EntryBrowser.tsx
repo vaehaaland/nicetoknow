@@ -31,7 +31,7 @@ function ExpiryBadge({ entry, today }: { entry: Entry; today: string }) {
         : "bg-bg text-muted";
   return (
     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${tone}`}>
-      {days < 0 ? "Utgått" : CATEGORIES[entry.category].dateLabel} {formatDate(entry.expires_at)}
+      {days < 0 ? "Utgått" : (CATEGORIES[entry.category].dateLabel ?? "Dato")} {formatDate(entry.expires_at)}
     </span>
   );
 }
@@ -108,6 +108,11 @@ function EntryCard({ entry, today, owner, parent, benefits, onEdit, onAddBenefit
             Via {parent.title}
           </button>
         )}
+        {entry.purchased_at && (
+          <span className="rounded-full bg-bg px-2 py-0.5 text-xs font-medium text-muted">
+            Kjøpt {formatDate(entry.purchased_at)}
+          </span>
+        )}
         <ExpiryBadge entry={entry} today={today} />
         {entry.tags.map((tag) => (
           <span key={tag} className="rounded-full border border-border px-2 py-0.5 text-xs text-muted">
@@ -177,7 +182,7 @@ export function EntryBrowser({ entries, members, currentUserId, today }: Props) 
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Søk i kodar, butikkar, notat …"
+          placeholder="Søk i kodar, ting, mål, notat …"
           aria-label="Søk"
           className="field"
         />

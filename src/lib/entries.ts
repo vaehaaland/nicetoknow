@@ -1,6 +1,6 @@
 // Datamodell + kategori-konfig. Éi kjelde til sanning for skjema, kort og chat.
 
-export const CATEGORY_IDS = ["discount", "membership", "insurance", "other"] as const;
+export const CATEGORY_IDS = ["discount", "membership", "insurance", "product", "measurement", "other"] as const;
 export type CategoryId = (typeof CATEGORY_IDS)[number];
 
 export type Entry = {
@@ -12,6 +12,7 @@ export type Entry = {
   url: string | null;
   notes: string | null;
   expires_at: string | null; // ISO-dato (YYYY-MM-DD)
+  purchased_at: string | null; // kjøpsdato, berre for ting me eig
   tags: string[];
   parent_id: string | null; // medlemskapet ein fordel høyrer til
   owner_id: string | null; // kven det gjeld; null = felles
@@ -28,14 +29,16 @@ export const memberName = (member: Member, currentUserId: string) =>
 
 // Kolonnane appen les – held select-spørjingane like overalt
 export const ENTRY_COLUMNS =
-  "id, category, title, provider, code, url, notes, expires_at, tags, parent_id, owner_id, updated_at";
+  "id, category, title, provider, code, url, notes, expires_at, purchased_at, tags, parent_id, owner_id, updated_at";
 
 type CategoryConfig = {
   label: string; // namn i fleirtal (filter)
   singular: string;
   icon: string;
   codeLabel: string; // kva «code»-feltet tyder for kategorien
-  dateLabel: string; // kva «expires_at» tyder for kategorien
+  dateLabel: string | null; // kva «expires_at» tyder for kategorien; null = ingen dato
+  hasPurchaseDate?: boolean; // viser feltet «Kjøpt»
+  titleHint: string; // døme i tittelfeltet
   badge: string; // Tailwind-klassar for merkelappen
 };
 
@@ -46,6 +49,7 @@ export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
     icon: "🏷️",
     codeLabel: "Rabattkode",
     dateLabel: "Gyldig til",
+    titleHint: "10 % hos Zalando",
     badge: "bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200",
   },
   membership: {
@@ -54,6 +58,7 @@ export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
     icon: "🪪",
     codeLabel: "Medlemsnummer",
     dateLabel: "Fornyast",
+    titleHint: "Fagforbundet",
     badge: "bg-sky-100 text-sky-900 dark:bg-sky-900/40 dark:text-sky-200",
   },
   insurance: {
@@ -62,7 +67,27 @@ export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
     icon: "🛡️",
     codeLabel: "Polise-/avtalenummer",
     dateLabel: "Fornyast",
+    titleHint: "Reiseforsikring",
     badge: "bg-emerald-100 text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-200",
+  },
+  product: {
+    label: "Ting me eig",
+    singular: "Ting",
+    icon: "📦",
+    codeLabel: "Storleik / modell",
+    dateLabel: "Garanti til",
+    hasPurchaseDate: true,
+    titleHint: "Dr. Martens 1460",
+    badge: "bg-violet-100 text-violet-900 dark:bg-violet-900/40 dark:text-violet-200",
+  },
+  measurement: {
+    label: "Mål",
+    singular: "Mål",
+    icon: "📏",
+    codeLabel: "Mål / storleik",
+    dateLabel: null,
+    titleHint: "Skostorleik",
+    badge: "bg-rose-100 text-rose-900 dark:bg-rose-900/40 dark:text-rose-200",
   },
   other: {
     label: "Anna",
@@ -70,6 +95,7 @@ export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
     icon: "📌",
     codeLabel: "Referanse / kode",
     dateLabel: "Dato",
+    titleHint: "Wifi-passord på hytta",
     badge: "bg-stone-200 text-stone-800 dark:bg-stone-700 dark:text-stone-100",
   },
 };

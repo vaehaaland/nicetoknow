@@ -29,7 +29,9 @@ export async function saveEntry(formData: FormData): Promise<ActionResult> {
     code: optional(formData, "code"),
     url: optional(formData, "url"),
     notes: optional(formData, "notes"),
+    // Datofelt som kategorien ikkje har, blir ikkje sende inn → null
     expires_at: optional(formData, "expires_at"),
+    purchased_at: optional(formData, "purchased_at"),
     // Framandnøklane i databasen sikrar at begge peikar innanfor eigen husstand
     parent_id: optional(formData, "parent_id"),
     owner_id: optional(formData, "owner_id"),

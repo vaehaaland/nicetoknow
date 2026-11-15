@@ -64,7 +64,7 @@ export function EntryForm({ entry, defaultCategory, defaultParentId, memberships
         <input type="hidden" name="category" value={category} />
 
         {/* Kategorival styrer etikettane på felta under */}
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {CATEGORY_IDS.map((id) => (
             <button
               key={id}
@@ -81,9 +81,9 @@ export function EntryForm({ entry, defaultCategory, defaultParentId, memberships
         </div>
 
         <Field label="Tittel">
-          <input className="field" name="title" defaultValue={entry?.title} required maxLength={200} placeholder="T.d. «10 % hos Zalando»" />
+          <input className="field" name="title" defaultValue={entry?.title} required maxLength={200} placeholder={`T.d. «${config.titleHint}»`} />
         </Field>
-        <Field label="Leverandør / butikk">
+        <Field label={config.hasPurchaseDate ? "Merke / butikk" : "Leverandør / butikk"}>
           <input className="field" name="provider" defaultValue={entry?.provider ?? ""} />
         </Field>
         <Field label={config.codeLabel}>
@@ -114,9 +114,16 @@ export function EntryForm({ entry, defaultCategory, defaultParentId, memberships
           )}
         </div>
         <div className="grid gap-3.5 sm:grid-cols-2">
-          <Field label={config.dateLabel}>
-            <input className="field" type="date" name="expires_at" defaultValue={entry?.expires_at ?? ""} />
-          </Field>
+          {config.hasPurchaseDate && (
+            <Field label="Kjøpt">
+              <input className="field" type="date" name="purchased_at" defaultValue={entry?.purchased_at ?? ""} />
+            </Field>
+          )}
+          {config.dateLabel && (
+            <Field label={config.dateLabel}>
+              <input className="field" type="date" name="expires_at" defaultValue={entry?.expires_at ?? ""} />
+            </Field>
+          )}
           <Field label="Lenkje">
             <input className="field" type="url" name="url" defaultValue={entry?.url ?? ""} placeholder="https://" />
           </Field>
