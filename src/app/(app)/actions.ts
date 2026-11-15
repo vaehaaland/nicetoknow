@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { isCategory } from "@/lib/entries";
+import { toEntryValues } from "@/lib/entries";
 import { createClient, getUserId } from "@/lib/supabase/server";
 
 export type ActionResult = { error?: string };
@@ -18,28 +18,8 @@ function finish(error: { message: string } | null): ActionResult {
 
 // Opprettar ny oppføring, eller oppdaterer når skjemaet har ein id
 export async function saveEntry(formData: FormData): Promise<ActionResult> {
-  const category = formData.get("category");
-  const title = optional(formData, "title");
-  if (!isCategory(category) || !title) return { error: "Kategori og tittel må fyllast ut." };
-
-  const values = {
-    category,
-    title,
-    provider: optional(formData, "provider"),
-    code: optional(formData, "code"),
-    url: optional(formData, "url"),
-    notes: optional(formData, "notes"),
-    // Datofelt som kategorien ikkje har, blir ikkje sende inn → null
-    expires_at: optional(formData, "expires_at"),
-    purchased_at: optional(formData, "purchased_at"),
-    // Framandnøklane i databasen sikrar at begge peikar innanfor eigen husstand
-    parent_id: optional(formData, "parent_id"),
-    owner_id: optional(formData, "owner_id"),
-    tags: (optional(formData, "tags") ?? "")
-      .split(",")
-      .map((tag) => tag.trim().toLowerCase())
-      .filter(Boolean),
-  };
+  const values = toEntryValues(Object.fromEntries(formData));
+  if (!values) return { error: "Kategori og tittel må fyllast ut." };
 
   const supabase = await createClient();
   const id = optional(formData, "id");
@@ -47,6 +27,22 @@ export async function saveEntry(formData: FormData): Promise<ActionResult> {
   const { error } = id
     ? await supabase.from("entries").update(values).eq("id", id)
     : await supabase.from("entries").insert(values);
+  return finish(error);
+}
+
+const MAX_BATCH = 50;
+
+// Lagrar fleire nye oppføringar på éin gong (forslag frå chatten som brukaren har godkjent).
+// Forslaga kjem frå klienten og blir difor vaska på nytt her.
+export async function saveEntries(drafts: unknown): Promise<ActionResult> {
+  const values = (Array.isArray(drafts) ? drafts : [])
+    .slice(0, MAX_BATCH)
+    .map(toEntryValues)
+    .filter((value) => value !== null);
+  if (values.length === 0) return { error: "Ingenting å lagre." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("entries").insert(values);
   return finish(error);
 }
 
