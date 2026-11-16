@@ -1,6 +1,6 @@
 // Datamodell + kategori-konfig. Éi kjelde til sanning for skjema, kort og chat.
 
-export const CATEGORY_IDS = ["discount", "membership", "insurance", "product", "note", "other"] as const;
+export const CATEGORY_IDS = ["discount", "membership", "insurance", "product", "note"] as const;
 export type CategoryId = (typeof CATEGORY_IDS)[number];
 
 export type Entry = {
@@ -37,6 +37,7 @@ type CategoryConfig = {
   icon: string;
   codeLabel: string; // kva «code»-feltet tyder for kategorien
   dateLabel: string | null; // kva «expires_at» tyder for kategorien; null = ingen dato
+  plainDate?: boolean; // datoen er ikkje eit utløp: aldri «Utgått» eller raud merking
   hasPurchaseDate?: boolean; // viser feltet «Kjøpt»
   titleHint: string; // døme i tittelfeltet
   badge: string; // Tailwind-klassar for merkelappen
@@ -85,17 +86,9 @@ export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
     singular: "Kjekt å vite",
     icon: "💡",
     codeLabel: "Detalj / verdi",
-    dateLabel: null,
-    titleHint: "Veggmåling i stova",
-    badge: "bg-rose-100 text-rose-900 dark:bg-rose-900/40 dark:text-rose-200",
-  },
-  other: {
-    label: "Anna",
-    singular: "Anna",
-    icon: "📌",
-    codeLabel: "Referanse / kode",
     dateLabel: "Dato",
-    titleHint: "Wifi-passord på hytta",
+    plainDate: true,
+    titleHint: "Veggmåling i stova",
     badge: "bg-stone-200 text-stone-800 dark:bg-stone-700 dark:text-stone-100",
   },
 };

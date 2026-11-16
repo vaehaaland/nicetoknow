@@ -24,6 +24,15 @@ const EXPIRED_GRACE_DAYS = 30; // kor lenge noko utgått blir ståande i «Skjer
 const relativeDays = (days: number) =>
   days === 0 ? "i dag" : days === 1 ? "i morgon" : days > 0 ? `om ${days} dagar` : days === -1 ? "i går" : `for ${-days} dagar sidan`;
 
+// Teksten til høgre i stripa. Notat har ein nøytral dato: berre «om 9 dagar», utan «Utgått».
+function UpcomingLabel({ entry, days }: { entry: Entry; days: number }) {
+  const { dateLabel, plainDate } = CATEGORIES[entry.category];
+  const expired = days < 0 && !plainDate;
+  const tone = expired ? "text-danger" : days < 0 ? "text-muted" : "text-amber-700 dark:text-amber-300";
+  const prefix = plainDate ? "" : expired ? "Utgått " : `${dateLabel} `;
+  return <span className={`shrink-0 text-xs font-medium ${tone}`}>{prefix + relativeDays(days)}</span>;
+}
+
 // Stripe øvst: det som går ut, fornyast eller mistar garantien snart (eller nett har gjort det)
 function UpcomingStrip({ entries, today, onShow }: { entries: Entry[]; today: string; onShow: (title: string) => void }) {
   const upcoming = entries
@@ -42,9 +51,7 @@ function UpcomingStrip({ entries, today, onShow }: { entries: Entry[]; today: st
               <span className="min-w-0 truncate">
                 {CATEGORIES[entry.category].icon} {entry.title}
               </span>
-              <span className={`shrink-0 text-xs font-medium ${days < 0 ? "text-danger" : "text-amber-700 dark:text-amber-300"}`}>
-                {days < 0 ? "Utgått" : CATEGORIES[entry.category].dateLabel} {relativeDays(days)}
-              </span>
+              <UpcomingLabel entry={entry} days={days} />
             </button>
           </li>
         ))}
@@ -57,15 +64,17 @@ function UpcomingStrip({ entries, today, onShow }: { entries: Entry[]; today: st
 function ExpiryBadge({ entry, today }: { entry: Entry; today: string }) {
   if (!entry.expires_at) return null;
   const days = daysUntil(entry.expires_at, today);
+  const { dateLabel, plainDate } = CATEGORIES[entry.category];
+  const expired = days < 0 && !plainDate;
   const tone =
-    days < 0
+    expired
       ? "bg-danger/15 text-danger"
-      : days <= EXPIRY_WARNING_DAYS
+      : days >= 0 && days <= EXPIRY_WARNING_DAYS
         ? "bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200"
         : "bg-bg text-muted";
   return (
     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${tone}`}>
-      {days < 0 ? "Utgått" : (CATEGORIES[entry.category].dateLabel ?? "Dato")} {formatDate(entry.expires_at)}
+      {expired ? "Utgått" : (dateLabel ?? "Dato")} {formatDate(entry.expires_at)}
     </span>
   );
 }
@@ -292,8 +301,8 @@ export function EntryBrowser({ entries, members, currentUserId, today }: Props) 
         <EntryForm
           key={editing.entry?.id ?? `new-${editing.parentId}`}
           entry={editing.entry}
-          // Ein ny fordel under eit medlemskap startar som «Anna»
-          defaultCategory={editing.parentId ? "other" : filter === "all" ? "discount" : filter}
+          // Ein ny fordel under eit medlemskap startar som «Kjekt å vite»
+          defaultCategory={editing.parentId ? "note" : filter === "all" ? "discount" : filter}
           defaultParentId={editing.parentId}
           memberships={memberships}
           members={members}
