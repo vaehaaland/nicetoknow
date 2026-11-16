@@ -2,21 +2,10 @@
 
 import { useState, useTransition } from "react";
 import { updateProfile } from "@/app/(app)/actions";
+import { scaleImage } from "@/lib/image";
 import { Avatar } from "./Avatar";
 
 const AVATAR_SIZE = 128; // px – held data-URL-en på nokre få kB
-
-// Skalerer og kvadrat-kuttar biletet i nettlesaren, og returnerer ein JPEG data-URL
-async function toAvatarDataUrl(file: File) {
-  const bitmap = await createImageBitmap(file);
-  const side = Math.min(bitmap.width, bitmap.height);
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = AVATAR_SIZE;
-  canvas
-    .getContext("2d")!
-    .drawImage(bitmap, (bitmap.width - side) / 2, (bitmap.height - side) / 2, side, side, 0, 0, AVATAR_SIZE, AVATAR_SIZE);
-  return canvas.toDataURL("image/jpeg", 0.85);
-}
 
 type Props = { displayName: string | null; avatar: string | null };
 
@@ -29,7 +18,7 @@ export function ProfileForm({ displayName, avatar }: Props) {
   async function pickImage(file: File | undefined) {
     if (!file) return;
     try {
-      setPreview(await toAvatarDataUrl(file));
+      setPreview(await scaleImage(file, { maxSide: AVATAR_SIZE, square: true }));
     } catch {
       setMessage({ text: "Kunne ikkje lese biletet.", isError: true });
     }
