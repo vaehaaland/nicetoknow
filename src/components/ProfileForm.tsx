@@ -32,7 +32,7 @@ export function ProfileForm({ displayName, avatar }: Props) {
 
   return (
     <form action={save} className="card flex flex-col gap-3 p-5">
-      <h2 className="font-semibold">Profilen din</h2>
+      <h2 className="text-base font-medium">Profilen din</h2>
       <div className="flex items-center gap-4">
         <Avatar name={displayName ?? "?"} src={preview ?? avatar} size={64} />
         <label className="btn-ghost cursor-pointer">

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { deleteEntry, saveEntry, type ActionResult } from "@/app/(app)/actions";
+import { Icon } from "./Icon";
 import { CATEGORIES, CATEGORY_IDS, memberName, type CategoryId, type Entry, type Member } from "@/lib/entries";
 
 type Props = {
@@ -17,7 +18,7 @@ type Props = {
 // Etikett + felt med lik utforming
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label className="flex flex-col gap-1 text-sm font-medium">
+    <label className="flex flex-col gap-1 text-xs font-medium text-muted">
       {label}
       {children}
     </label>
@@ -50,13 +51,14 @@ export function EntryForm({ entry, defaultCategory, defaultParentId, memberships
     <dialog
       ref={dialogRef}
       onClose={onClose}
-      className="m-0 mt-auto max-h-[92dvh] w-full max-w-none rounded-t-3xl bg-bg p-0 text-text sm:m-auto sm:max-w-lg sm:rounded-3xl"
+      // Botnark på mobil, dialog på større skjermar (M3: 28px hjørne, surface-container-high)
+      className="m-0 mt-auto max-h-[92dvh] w-full max-w-none rounded-t-[28px] bg-container-high p-0 text-text shadow-level3 sm:m-auto sm:max-w-lg sm:rounded-[28px]"
     >
-      <form action={(formData) => run(() => saveEntry(formData))} className="flex flex-col gap-3.5 p-5">
+      <form action={(formData) => run(() => saveEntry(formData))} className="flex flex-col gap-4 p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold">{entry ? "Rediger" : "Ny oppføring"}</h2>
-          <button type="button" onClick={onClose} aria-label="Lukk" className="btn-ghost min-h-9 px-3">
-            ✕
+          <h2 className="text-2xl leading-8">{entry ? "Rediger" : "Ny oppføring"}</h2>
+          <button type="button" onClick={onClose} aria-label="Lukk" className="btn-icon -mr-2">
+            <Icon name="close" />
           </button>
         </div>
 
@@ -64,18 +66,17 @@ export function EntryForm({ entry, defaultCategory, defaultParentId, memberships
         <input type="hidden" name="category" value={category} />
 
         {/* Kategorival styrer etikettane på felta under */}
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <div className="flex flex-wrap gap-2">
           {CATEGORY_IDS.map((id) => (
             <button
               key={id}
               type="button"
               onClick={() => setCategory(id)}
               aria-pressed={id === category}
-              className={`btn px-2 text-xs ${
-                id === category ? "bg-accent text-accent-text" : "border border-border bg-surface"
-              }`}
+              className={`chip state-layer text-text ${id === category ? "chip-selected pl-2" : ""}`}
             >
-              {CATEGORIES[id].icon} {CATEGORIES[id].singular}
+              <Icon name={id === category ? "check" : CATEGORIES[id].icon} size={18} className={id === category ? "" : "text-accent"} />
+              {CATEGORIES[id].singular}
             </button>
           ))}
         </div>
@@ -143,12 +144,12 @@ export function EntryForm({ entry, defaultCategory, defaultParentId, memberships
               type="button"
               disabled={pending}
               onClick={() => confirm(`Slette «${entry.title}»?`) && run(() => deleteEntry(entry.id))}
-              className="btn border border-danger/40 text-danger"
+              className="btn-text text-danger"
             >
-              Slett
+              <Icon name="delete" size={18} /> Slett
             </button>
           )}
-          <button disabled={pending} className="btn-primary ml-auto flex-1 sm:flex-none sm:px-8">
+          <button disabled={pending} className="btn-primary ml-auto">
             {pending ? "Lagrar …" : "Lagre"}
           </button>
         </div>

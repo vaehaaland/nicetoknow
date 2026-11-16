@@ -12,9 +12,11 @@ import {
   type Entry,
   type Member,
 } from "@/lib/entries";
+import type { IconName } from "@/lib/icons";
 import { Avatar } from "./Avatar";
 import { CopyButton } from "./CopyButton";
 import { EntryForm } from "./EntryForm";
+import { Icon } from "./Icon";
 
 type Filter = CategoryId | "all";
 const EXPIRY_WARNING_DAYS = 30;
@@ -28,12 +30,12 @@ const relativeDays = (days: number) =>
 function UpcomingLabel({ entry, days }: { entry: Entry; days: number }) {
   const { dateLabel, plainDate } = CATEGORIES[entry.category];
   const expired = days < 0 && !plainDate;
-  const tone = expired ? "text-danger" : days < 0 ? "text-muted" : "text-amber-700 dark:text-amber-300";
+  const tone = expired ? "text-danger" : "text-muted";
   const prefix = plainDate ? "" : expired ? "Utgått " : `${dateLabel} `;
   return <span className={`shrink-0 text-xs font-medium ${tone}`}>{prefix + relativeDays(days)}</span>;
 }
 
-// Stripe øvst: det som går ut, fornyast eller mistar garantien snart (eller nett har gjort det)
+// Kort øvst: det som går ut, fornyast eller mistar garantien snart (eller nett har gjort det)
 function UpcomingStrip({ entries, today, onShow }: { entries: Entry[]; today: string; onShow: (title: string) => void }) {
   const upcoming = entries
     .flatMap((entry) => (entry.expires_at ? [{ entry, days: daysUntil(entry.expires_at, today) }] : []))
@@ -42,15 +44,17 @@ function UpcomingStrip({ entries, today, onShow }: { entries: Entry[]; today: st
   if (upcoming.length === 0) return null;
 
   return (
-    <section aria-label="Skjer snart" className="card flex flex-col gap-1 px-4 py-3">
-      <h2 className="text-xs font-semibold text-muted">⏰ Skjer snart</h2>
-      <ul className="flex flex-col">
+    // Fylt kort i tertiærfarge skil «hugs dette» frå dei vanlege korta
+    <section aria-label="Skjer snart" className="rounded-xl bg-tertiary-container py-2 text-on-tertiary-container">
+      <h2 className="flex items-center gap-2 px-4 py-2 text-sm font-medium">
+        <Icon name="schedule" size={18} /> Skjer snart
+      </h2>
+      <ul>
         {upcoming.map(({ entry, days }) => (
           <li key={entry.id}>
-            <button onClick={() => onShow(entry.title)} className="flex w-full items-baseline justify-between gap-3 py-1 text-left text-sm">
-              <span className="min-w-0 truncate">
-                {CATEGORIES[entry.category].icon} {entry.title}
-              </span>
+            <button onClick={() => onShow(entry.title)} className="state-layer flex min-h-12 w-full items-center gap-3 px-4 text-left text-sm">
+              <Icon name={CATEGORIES[entry.category].icon} size={20} />
+              <span className="min-w-0 flex-1 truncate">{entry.title}</span>
               <UpcomingLabel entry={entry} days={days} />
             </button>
           </li>
@@ -60,20 +64,19 @@ function UpcomingStrip({ entries, today, onShow }: { entries: Entry[]; today: st
   );
 }
 
-// Merkelapp for utløp/fornying: raud når passert, gul når det nærmar seg
+// Merkelapp for utløp/fornying: feilfarge når passert, tertiær når det nærmar seg
 function ExpiryBadge({ entry, today }: { entry: Entry; today: string }) {
   if (!entry.expires_at) return null;
   const days = daysUntil(entry.expires_at, today);
   const { dateLabel, plainDate } = CATEGORIES[entry.category];
   const expired = days < 0 && !plainDate;
-  const tone =
-    expired
-      ? "bg-danger/15 text-danger"
-      : days >= 0 && days <= EXPIRY_WARNING_DAYS
-        ? "bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200"
-        : "bg-bg text-muted";
+  const tone = expired
+    ? "border-transparent bg-error-container text-on-error-container"
+    : days >= 0 && days <= EXPIRY_WARNING_DAYS
+      ? "border-transparent bg-tertiary-container text-on-tertiary-container"
+      : "";
   return (
-    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${tone}`}>
+    <span className={`chip ${tone}`}>
       {expired ? "Utgått" : (dateLabel ?? "Dato")} {formatDate(entry.expires_at)}
     </span>
   );
@@ -94,22 +97,26 @@ function EntryCard({ entry, today, owner, parent, benefits, onEdit, onAddBenefit
   const config = CATEGORIES[entry.category];
 
   return (
-    <li className="card flex min-w-0 flex-col gap-2.5 p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className="font-semibold leading-snug break-words">{entry.title}</h3>
-          {entry.provider && <p className="text-sm text-muted">{entry.provider}</p>}
+    <li className="card flex min-w-0 flex-col gap-3 p-4">
+      {/* Hovud: kategori-ikon, tittel og rediger */}
+      <div className="flex items-start gap-3">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container" title={config.singular}>
+          <Icon name={config.icon} size={20} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h3 className="text-base leading-6 font-medium break-words">{entry.title}</h3>
+          <p className="text-sm text-muted break-words">{[config.singular, entry.provider].filter(Boolean).join(" · ")}</p>
         </div>
-        <button onClick={onEdit} className="btn-ghost min-h-9 shrink-0 px-3 text-xs">
-          Rediger
+        <button onClick={onEdit} aria-label={`Rediger ${entry.title}`} title="Rediger" className="btn-icon -mt-1 -mr-2">
+          <Icon name="edit" size={20} />
         </button>
       </div>
 
       {entry.code && (
-        <div className="flex items-center justify-between gap-2 rounded-xl bg-bg py-1.5 pr-1.5 pl-3">
+        <div className="flex items-center justify-between gap-2 rounded-lg bg-container-high py-1.5 pr-1 pl-4">
           <div className="min-w-0">
-            <p className="text-[11px] text-muted">{config.codeLabel}</p>
-            <p className="font-mono text-base font-semibold break-all select-all">{entry.code}</p>
+            <p className="text-xs text-muted">{config.codeLabel}</p>
+            <p className="font-mono text-base font-medium break-all select-all">{entry.code}</p>
           </div>
           <CopyButton value={entry.code} />
         </div>
@@ -119,52 +126,45 @@ function EntryCard({ entry, today, owner, parent, benefits, onEdit, onAddBenefit
 
       {/* Medlemskap: fordelane som høyrer til */}
       {entry.category === "membership" && (
-        <div className="flex flex-col gap-1.5 rounded-xl border border-border px-3 py-2">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-semibold text-muted">Fordelar ({benefits.length})</p>
-            <button onClick={onAddBenefit} className="text-xs font-semibold text-accent">
-              + Legg til fordel
+        <div className="flex flex-col rounded-lg border border-border py-1">
+          <div className="flex items-center justify-between gap-2 pr-1 pl-4">
+            <p className="text-sm font-medium text-muted">Fordelar ({benefits.length})</p>
+            <button onClick={onAddBenefit} className="btn-text">
+              <Icon name="add" size={18} /> Legg til
             </button>
           </div>
           {benefits.map((benefit) => (
-            <button key={benefit.id} onClick={() => onShow(benefit.title)} className="truncate text-left text-sm hover:text-accent">
-              {CATEGORIES[benefit.category].icon} {benefit.title}
-              {benefit.provider && <span className="text-muted"> · {benefit.provider}</span>}
+            <button key={benefit.id} onClick={() => onShow(benefit.title)} className="state-layer flex min-h-10 items-center gap-3 px-4 text-left text-sm">
+              <Icon name={CATEGORIES[benefit.category].icon} size={18} className="text-muted" />
+              <span className="min-w-0 truncate">
+                {benefit.title}
+                {benefit.provider && <span className="text-muted"> · {benefit.provider}</span>}
+              </span>
             </button>
           ))}
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-1.5">
-        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${config.badge}`}>
-          {config.icon} {config.singular}
-        </span>
-        <span className="flex items-center gap-1 rounded-full border border-border py-0.5 pr-2 pl-0.5 text-xs">
-          {owner ? <Avatar name={owner.name} src={owner.avatar} size={16} /> : <span aria-hidden className="pl-1.5">👥</span>}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="chip pl-1.5">
+          {owner ? <Avatar name={owner.name} src={owner.avatar} size={20} /> : <Icon name="group" size={18} className="ml-0.5" />}
           {owner?.name ?? "Felles"}
         </span>
         {parent && (
-          <button
-            onClick={() => onShow(parent.title)}
-            className="max-w-full truncate rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-900 dark:bg-sky-900/40 dark:text-sky-200"
-          >
-            Via {parent.title}
+          <button onClick={() => onShow(parent.title)} className="chip chip-selected state-layer">
+            <span className="truncate">Via {parent.title}</span>
           </button>
         )}
-        {entry.purchased_at && (
-          <span className="rounded-full bg-bg px-2 py-0.5 text-xs font-medium text-muted">
-            Kjøpt {formatDate(entry.purchased_at)}
-          </span>
-        )}
+        {entry.purchased_at && <span className="chip">Kjøpt {formatDate(entry.purchased_at)}</span>}
         <ExpiryBadge entry={entry} today={today} />
         {entry.tags.map((tag) => (
-          <span key={tag} className="rounded-full border border-border px-2 py-0.5 text-xs text-muted">
+          <span key={tag} className="chip">
             #{tag}
           </span>
         ))}
         {entry.url && (
-          <a href={entry.url} target="_blank" rel="noopener noreferrer" className="ml-auto text-sm font-semibold text-accent">
-            Opne lenkje ↗
+          <a href={entry.url} target="_blank" rel="noopener noreferrer" className="btn-text ml-auto">
+            Opne <Icon name="open_in_new" size={18} />
           </a>
         )}
       </div>
@@ -213,44 +213,48 @@ export function EntryBrowser({ entries, members, currentUserId, today }: Props) 
     window.scrollTo({ top: 0 });
   };
 
-  const filters: { id: Filter; label: string }[] = [
+  const filters: { id: Filter; label: string; icon?: IconName }[] = [
     { id: "all", label: "Alle" },
-    ...CATEGORY_IDS.map((id) => ({ id, label: `${CATEGORIES[id].icon} ${CATEGORIES[id].label}` })),
+    ...CATEGORY_IDS.map((id) => ({ id, label: CATEGORIES[id].label, icon: CATEGORIES[id].icon })),
   ];
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex gap-2">
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Søk i kodar, ting, notat …"
-          aria-label="Søk"
-          className="field"
-        />
-        <button onClick={() => openNew()} className="btn-primary hidden shrink-0 sm:inline-flex">
-          + Legg til
+      <div className="flex gap-3">
+        {/* M3 search bar: pilleforma, fylt, med ikon framfor */}
+        <label className="flex h-14 min-w-0 flex-1 items-center gap-3 rounded-full bg-container-high px-4 text-muted focus-within:ring-2 focus-within:ring-accent">
+          <Icon name="search" />
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Søk i kodar, ting, notat …"
+            aria-label="Søk"
+            className="min-w-0 flex-1 bg-transparent text-base text-text outline-none placeholder:text-muted"
+          />
+        </label>
+        <button onClick={() => openNew()} className="btn-primary hidden h-14 shrink-0 sm:inline-flex">
+          <Icon name="add" size={20} /> Legg til
         </button>
       </div>
 
-      {/* Horisontalt rullbare filter på mobil */}
+      {/* Filter-chips, horisontalt rullbare på mobil */}
       <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
-        {filters.map(({ id, label }) => (
+        {filters.map(({ id, label, icon }) => (
           <button
             key={id}
             onClick={() => setFilter(id)}
             aria-pressed={filter === id}
-            className={`min-h-9 shrink-0 rounded-full border px-3.5 text-sm font-medium ${
-              filter === id ? "border-accent bg-accent text-accent-text" : "border-border bg-surface text-text"
-            }`}
+            className={`chip state-layer text-text ${filter === id ? "chip-selected pl-2" : ""}`}
           >
+            {/* Vald chip får hake framfor, slik M3 filter chips gjer */}
+            {filter === id ? <Icon name="check" size={18} /> : icon && <Icon name={icon} size={18} className="text-accent" />}
             {label}
           </button>
         ))}
       </div>
 
-      {/* Berre i den ufiltrerte oversikta, så stripa ikkje står i vegen for eit søk */}
+      {/* Berre i den ufiltrerte oversikta, så kortet ikkje står i vegen for eit søk */}
       {!query && filter === "all" && <UpcomingStrip entries={entries} today={today} onShow={show} />}
 
       {visible.length > 0 ? (
@@ -271,10 +275,10 @@ export function EntryBrowser({ entries, members, currentUserId, today }: Props) 
           ))}
         </ul>
       ) : (
-        <div className="card flex flex-col items-center gap-3 px-6 py-12 text-center">
-          <p className="text-4xl" aria-hidden>
-            {entries.length === 0 ? "🗂️" : "🔍"}
-          </p>
+        <div className="flex flex-col items-center gap-4 px-6 py-16 text-center">
+          <span className="flex size-16 items-center justify-center rounded-full bg-container-high text-muted">
+            <Icon name={entries.length === 0 ? "inventory_2" : "search"} size={32} />
+          </span>
           <p className="text-muted">
             {entries.length === 0
               ? "Ingenting her enno. Legg inn den første rabattkoden, medlemskapet eller forsikringa."
@@ -282,19 +286,19 @@ export function EntryBrowser({ entries, members, currentUserId, today }: Props) 
           </p>
           {entries.length === 0 && (
             <button onClick={() => openNew()} className="btn-primary">
-              + Legg til
+              <Icon name="add" size={20} /> Legg til
             </button>
           )}
         </div>
       )}
 
-      {/* Flytande knapp over botn-fana på mobil */}
+      {/* FAB over botn-navigasjonen på mobil */}
       <button
         onClick={() => openNew()}
         aria-label="Legg til"
-        className="fixed right-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-20 flex size-14 items-center justify-center rounded-full bg-accent text-3xl text-accent-text shadow-lg active:scale-95 sm:hidden"
+        className="state-layer fixed right-4 bottom-[calc(6rem+env(safe-area-inset-bottom))] z-20 flex size-14 items-center justify-center rounded-2xl bg-primary-container text-on-primary-container shadow-level3 sm:hidden"
       >
-        +
+        <Icon name="add" />
       </button>
 
       {editing && (

@@ -1,3 +1,5 @@
+import type { IconName } from "./icons";
+
 // Datamodell + kategori-konfig. Éi kjelde til sanning for skjema, kort og chat.
 
 export const CATEGORY_IDS = ["discount", "membership", "insurance", "product", "note"] as const;
@@ -34,62 +36,56 @@ export const ENTRY_COLUMNS =
 type CategoryConfig = {
   label: string; // namn i fleirtal (filter)
   singular: string;
-  icon: string;
+  icon: IconName;
   codeLabel: string; // kva «code»-feltet tyder for kategorien
   dateLabel: string | null; // kva «expires_at» tyder for kategorien; null = ingen dato
   plainDate?: boolean; // datoen er ikkje eit utløp: aldri «Utgått» eller raud merking
   hasPurchaseDate?: boolean; // viser feltet «Kjøpt»
   titleHint: string; // døme i tittelfeltet
-  badge: string; // Tailwind-klassar for merkelappen
 };
 
 export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
   discount: {
     label: "Rabattkodar",
     singular: "Rabattkode",
-    icon: "🏷️",
+    icon: "sell",
     codeLabel: "Rabattkode",
     dateLabel: "Gyldig til",
     titleHint: "10 % hos Zalando",
-    badge: "bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200",
   },
   membership: {
     label: "Medlemskap",
     singular: "Medlemskap",
-    icon: "🪪",
+    icon: "id_card",
     codeLabel: "Medlemsnummer",
     dateLabel: "Fornyast",
     titleHint: "Fagforbundet",
-    badge: "bg-sky-100 text-sky-900 dark:bg-sky-900/40 dark:text-sky-200",
   },
   insurance: {
     label: "Forsikringar",
     singular: "Forsikring",
-    icon: "🛡️",
+    icon: "shield",
     codeLabel: "Polise-/avtalenummer",
     dateLabel: "Fornyast",
     titleHint: "Reiseforsikring",
-    badge: "bg-emerald-100 text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-200",
   },
   product: {
     label: "Ting me eig",
     singular: "Ting",
-    icon: "📦",
+    icon: "inventory_2",
     codeLabel: "Storleik / modell",
     dateLabel: "Garanti til",
     hasPurchaseDate: true,
     titleHint: "Dr. Martens 1460",
-    badge: "bg-violet-100 text-violet-900 dark:bg-violet-900/40 dark:text-violet-200",
   },
   note: {
     label: "Kjekt å vite",
     singular: "Kjekt å vite",
-    icon: "💡",
+    icon: "lightbulb",
     codeLabel: "Detalj / verdi",
     dateLabel: "Dato",
     plainDate: true,
     titleHint: "Veggmåling i stova",
-    badge: "bg-stone-200 text-stone-800 dark:bg-stone-700 dark:text-stone-100",
   },
 };
 

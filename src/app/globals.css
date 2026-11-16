@@ -1,65 +1,133 @@
 @import "tailwindcss";
 
-/* Fargetokens – lys og mørk modus følgjer systemet */
+/* Material Design 3: fargeroller frå eitt grønt utgangspunkt. Lys og mørk modus følgjer systemet. */
 :root {
-  --bg: #f7f5f0;
-  --surface: #ffffff;
-  --border: #e4dfd5;
-  --text: #1f1d1a;
-  --muted: #6f6a60;
-  --accent: #2f5d50;
-  --accent-text: #ffffff;
-  --danger: #b3261e;
+  --primary: #006b5f;
+  --on-primary: #ffffff;
+  --primary-container: #9ef2e2;
+  --on-primary-container: #00201c;
+  --secondary-container: #cce8e2;
+  --on-secondary-container: #05201c;
+  --tertiary-container: #ffddb3;
+  --on-tertiary-container: #291800;
+  --error: #ba1a1a;
+  --error-container: #ffdad6;
+  --on-error-container: #410002;
+  --surface: #f4fbf8;
+  --surface-container-low: #eff5f2;
+  --surface-container: #e9efec;
+  --surface-container-high: #e3eae7;
+  --surface-container-highest: #dde4e1;
+  --on-surface: #161d1b;
+  --on-surface-variant: #3f4946;
+  --outline: #6f7976;
+  --outline-variant: #bec9c5;
+  --shadow: 0 0 0;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #161514;
-    --surface: #211f1d;
-    --border: #38342f;
-    --text: #f1eee8;
-    --muted: #a39d92;
-    --accent: #7fc4ae;
-    --accent-text: #10201b;
-    --danger: #ff8a80;
+    --primary: #82d5c7;
+    --on-primary: #003731;
+    --primary-container: #005047;
+    --on-primary-container: #9ef2e2;
+    --secondary-container: #334b47;
+    --on-secondary-container: #cce8e2;
+    --tertiary-container: #5e4100;
+    --on-tertiary-container: #ffddb3;
+    --error: #ffb4ab;
+    --error-container: #93000a;
+    --on-error-container: #ffdad6;
+    --surface: #0e1513;
+    --surface-container-low: #161d1b;
+    --surface-container: #1a211f;
+    --surface-container-high: #252b29;
+    --surface-container-highest: #2f3634;
+    --on-surface: #dde4e1;
+    --on-surface-variant: #bec9c5;
+    --outline: #899390;
+    --outline-variant: #3f4946;
   }
 }
 
 @theme inline {
-  --color-bg: var(--bg);
-  --color-surface: var(--surface);
-  --color-border: var(--border);
-  --color-text: var(--text);
-  --color-muted: var(--muted);
-  --color-accent: var(--accent);
-  --color-accent-text: var(--accent-text);
-  --color-danger: var(--danger);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Korte namn brukte i heile appen, mappa til M3-rollene */
+  --color-bg: var(--surface);
+  --color-surface: var(--surface-container-low);
+  --color-container: var(--surface-container);
+  --color-container-high: var(--surface-container-high);
+  --color-container-highest: var(--surface-container-highest);
+  --color-text: var(--on-surface);
+  --color-muted: var(--on-surface-variant);
+  --color-border: var(--outline-variant);
+  --color-outline: var(--outline);
+  --color-accent: var(--primary);
+  --color-accent-text: var(--on-primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+  --color-tertiary-container: var(--tertiary-container);
+  --color-on-tertiary-container: var(--on-tertiary-container);
+  --color-danger: var(--error);
+  --color-error-container: var(--error-container);
+  --color-on-error-container: var(--on-error-container);
+  --font-sans: var(--font-roboto);
+  --font-mono: var(--font-roboto-mono);
+  /* M3-høgdenivå */
+  --shadow-level1: 0 1px 2px rgb(var(--shadow) / 0.3), 0 1px 3px 1px rgb(var(--shadow) / 0.15);
+  --shadow-level3: 0 1px 3px rgb(var(--shadow) / 0.3), 0 4px 8px 3px rgb(var(--shadow) / 0.15);
 }
 
 body {
-  background: var(--bg);
-  color: var(--text);
+  background: var(--surface);
+  color: var(--on-surface);
 }
 
-/* Gjenbrukte skjema-/knappestilar (16px tekst hindrar auto-zoom på iOS) */
-@utility field {
-  @apply w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-base text-text outline-none placeholder:text-muted focus:border-accent focus:ring-2 focus:ring-accent/25;
+/* Tilstandslag: halvgjennomsiktig slør i tekstfargen ved hover/trykk, slik M3 føreskriv */
+@utility state-layer {
+  @apply relative overflow-hidden transition-shadow before:pointer-events-none before:absolute before:inset-0 before:bg-current before:opacity-0 before:transition-opacity hover:before:opacity-[0.08] active:before:opacity-[0.12];
 }
+
+/* Tekstfelt (outlined). 16px tekst hindrar auto-zoom på iOS. */
+@utility field {
+  @apply w-full rounded-sm border border-outline bg-transparent px-4 py-3 text-base text-text outline-none placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent focus:ring-inset;
+}
+
+/* Knappar: felles form, så variantane filled / tonal / outlined / text */
 @utility btn {
-  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition active:scale-[0.98] disabled:opacity-50;
+  @apply state-layer inline-flex min-h-10 items-center justify-center gap-2 rounded-full px-6 text-sm font-medium tracking-[0.1px] disabled:pointer-events-none disabled:opacity-40;
 }
 @utility btn-primary {
-  @apply btn bg-accent text-accent-text hover:opacity-90;
+  @apply btn bg-accent text-accent-text hover:shadow-level1;
+}
+@utility btn-tonal {
+  @apply btn bg-secondary-container text-on-secondary-container hover:shadow-level1;
 }
 @utility btn-ghost {
-  @apply btn border border-border bg-surface text-text hover:bg-bg;
+  @apply btn border border-outline text-accent;
 }
+@utility btn-text {
+  @apply btn px-3 text-accent;
+}
+/* Ikonknapp: 40px rund */
+@utility btn-icon {
+  @apply state-layer inline-flex size-10 shrink-0 items-center justify-center rounded-full text-muted;
+}
+
+/* Kort (outlined) */
 @utility card {
-  @apply rounded-2xl border border-border bg-surface;
+  @apply rounded-xl border border-border bg-surface;
+}
+
+/* Chip: brikke for filter og merkelappar */
+@utility chip {
+  @apply inline-flex h-8 max-w-full shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 text-sm font-medium text-muted;
+}
+@utility chip-selected {
+  @apply border-transparent bg-secondary-container text-on-secondary-container;
 }
 
 dialog::backdrop {
-  background: rgb(0 0 0 / 0.45);
+  background: rgb(0 0 0 / 0.32);
 }

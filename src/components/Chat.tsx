@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { saveEntries } from "@/app/(app)/actions";
 import { CATEGORIES, PROPOSALS_MARKER, type EntryDraft } from "@/lib/entries";
 import { CHAT_IMAGE, scaleImage } from "@/lib/image";
+import { Icon } from "./Icon";
 
 type Message = {
   role: "user" | "assistant";
@@ -31,15 +32,15 @@ function Thumbnails({ images, className = "", onRemove }: { images: string[]; cl
       {images.map((src, index) => (
         <li key={index} className="relative">
           {/* eslint-disable-next-line @next/next/no-img-element -- data-URL, ingenting å optimalisere */}
-          <img src={src} alt={`Vedlegg ${index + 1}`} className="size-20 rounded-xl border border-border object-cover" />
+          <img src={src} alt={`Vedlegg ${index + 1}`} className="size-20 rounded-lg border border-border object-cover" />
           {onRemove && (
             <button
               type="button"
               onClick={() => onRemove(index)}
               aria-label={`Fjern vedlegg ${index + 1}`}
-              className="absolute -top-1.5 -right-1.5 flex size-6 items-center justify-center rounded-full bg-text text-xs text-bg"
+              className="absolute -top-1.5 -right-1.5 flex size-6 items-center justify-center rounded-full bg-text text-bg"
             >
-              ✕
+              <Icon name="close" size={16} />
             </button>
           )}
         </li>
@@ -54,7 +55,7 @@ function Proposals({ message, onChange }: { message: Message; onChange: (patch: 
   const [pending, startTransition] = useTransition();
   const drafts = message.proposals ?? [];
 
-  if (message.saved) return <p className="self-start text-sm text-muted">✓ {message.saved} lagt til i oversikta</p>;
+  if (message.saved) return <p className="flex items-center gap-1.5 self-start text-sm text-muted"><Icon name="check" size={18} /> {message.saved} lagt til i oversikta</p>;
   if (drafts.length === 0) return null;
 
   const save = () =>
@@ -69,9 +70,9 @@ function Proposals({ message, onChange }: { message: Message; onChange: (patch: 
       <ul className="flex flex-col divide-y divide-border">
         {drafts.map((draft, index) => (
           <li key={index} className="flex items-start gap-2 py-2 text-sm">
-            <span aria-hidden>{CATEGORIES[draft.category].icon}</span>
+            <Icon name={CATEGORIES[draft.category].icon} size={20} className="mt-0.5 text-muted" />
             <div className="min-w-0 flex-1">
-              <p className="font-semibold break-words">{draft.title}</p>
+              <p className="font-medium break-words">{draft.title}</p>
               {/* Dei viktigaste felta på éi linje */}
               <p className="text-muted break-words">
                 {[
@@ -91,15 +92,15 @@ function Proposals({ message, onChange }: { message: Message; onChange: (patch: 
             <button
               onClick={() => onChange({ proposals: drafts.filter((_, i) => i !== index) })}
               aria-label={`Fjern ${draft.title}`}
-              className="btn-ghost min-h-8 px-2.5 text-xs"
+              className="btn-icon -mr-2"
             >
-              ✕
+              <Icon name="close" size={20} />
             </button>
           </li>
         ))}
       </ul>
       {error && <p className="text-sm text-danger">{error}</p>}
-      <button onClick={save} disabled={pending} className="btn-primary">
+      <button onClick={save} disabled={pending} className="btn-primary self-end">
         {pending ? "Lagrar …" : `Legg til ${drafts.length} ${drafts.length === 1 ? "oppføring" : "oppføringar"}`}
       </button>
     </div>
@@ -187,11 +188,11 @@ export function Chat() {
     <div className="flex flex-1 flex-col gap-3">
       {messages.length === 0 ? (
         <div className="flex flex-1 flex-col justify-center gap-3 py-6">
-          <h1 className="text-xl font-bold">Spør Claude</h1>
+          <h1 className="text-[28px] leading-9">Spør Claude</h1>
           <p className="text-muted">Claude kan slå opp i alt de har lagra, og leggje inn nye ting frå ei liste eller eit bilete av ei kvittering. Prøv til dømes:</p>
           <div className="flex flex-col gap-2">
             {SUGGESTIONS.map((suggestion) => (
-              <button key={suggestion} onClick={() => send(suggestion)} className="card px-4 py-3 text-left text-sm hover:border-accent">
+              <button key={suggestion} onClick={() => send(suggestion)} className="card state-layer px-4 py-3 text-left text-sm">
                 {suggestion}
               </button>
             ))}
@@ -204,10 +205,10 @@ export function Chat() {
               {message.images && message.images.length > 0 && <Thumbnails images={message.images} className="justify-end" />}
               {(message.content || message.role === "assistant") && (
                 <p
-                  className={`max-w-[88%] rounded-2xl px-4 py-2.5 whitespace-pre-wrap break-words ${
+                  className={`max-w-[88%] rounded-[20px] px-4 py-2.5 whitespace-pre-wrap break-words ${
                     message.role === "user"
-                      ? "self-end rounded-br-md bg-accent text-accent-text"
-                      : "card self-start rounded-bl-md"
+                      ? "self-end rounded-br-sm bg-primary-container text-on-primary-container"
+                      : "self-start rounded-bl-sm bg-container-high"
                   }`}
                 >
                   {message.content || <span className="animate-pulse text-muted">Tenkjer …</span>}
@@ -234,8 +235,8 @@ export function Chat() {
             {notice && <p className="text-sm text-danger">{notice}</p>}
           </div>
         )}
-        <label className="btn-ghost shrink-0 cursor-pointer px-3" title="Legg ved bilete">
-          <span aria-hidden>📷</span>
+        <label className="btn-icon mb-2 cursor-pointer" title="Legg ved bilete">
+          <Icon name="photo_camera" />
           <span className="sr-only">Legg ved bilete</span>
           <input
             type="file"
@@ -250,7 +251,7 @@ export function Chat() {
         </label>
         {/* Tekstområde slik at innlimte lister held på linjeskifta; Enter sender, Shift+Enter gir ny linje */}
         <textarea
-          className="field min-w-0 flex-1 resize-none"
+          className="min-w-0 flex-1 resize-none rounded-[28px] bg-container-high px-5 py-4 text-base text-text outline-none placeholder:text-muted focus:ring-2 focus:ring-accent"
           rows={Math.min(6, input.split("\n").length)}
           value={input}
           onChange={(event) => setInput(event.target.value)}
@@ -264,8 +265,13 @@ export function Chat() {
           aria-label="Melding"
           maxLength={20000}
         />
-        <button disabled={busy || (!input.trim() && images.length === 0)} className="btn-primary shrink-0">
-          Send
+        {/* Fylt ikonknapp for sending */}
+        <button
+          disabled={busy || (!input.trim() && images.length === 0)}
+          aria-label="Send"
+          className="state-layer mb-2 flex size-10 shrink-0 items-center justify-center rounded-full bg-accent text-accent-text disabled:bg-text/12 disabled:text-text/40"
+        >
+          <Icon name="send" size={20} />
         </button>
       </form>
     </div>
