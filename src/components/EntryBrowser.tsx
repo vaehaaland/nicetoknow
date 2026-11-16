@@ -85,7 +85,7 @@ function EntryCard({ entry, today, owner, parent, benefits, onEdit, onAddBenefit
   const config = CATEGORIES[entry.category];
 
   return (
-    <li className="card flex flex-col gap-2.5 p-4">
+    <li className="card flex min-w-0 flex-col gap-2.5 p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="font-semibold leading-snug break-words">{entry.title}</h3>
@@ -245,7 +245,8 @@ export function EntryBrowser({ entries, members, currentUserId, today }: Props) 
       {!query && filter === "all" && <UpcomingStrip entries={entries} today={today} onShow={show} />}
 
       {visible.length > 0 ? (
-        <ul className="grid gap-3 sm:grid-cols-2">
+        // grid-cols-1 = minmax(0, 1fr): lange titlar får ikkje utvide kolonnen forbi skjermen
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {visible.map((entry) => (
             <EntryCard
               key={entry.id}
