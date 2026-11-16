@@ -37,6 +37,8 @@ type CategoryConfig = {
   label: string; // namn i fleirtal (filter)
   singular: string;
   icon: IconName;
+  tone: string; // fylt flate i kategorifargen (ikon-sirkel, vald chip)
+  ink: string; // kategorifargen som tekst-/ikonfarge på nøytral bakgrunn
   codeLabel: string; // kva «code»-feltet tyder for kategorien
   dateLabel: string | null; // kva «expires_at» tyder for kategorien; null = ingen dato
   plainDate?: boolean; // datoen er ikkje eit utløp: aldri «Utgått» eller raud merking
@@ -49,6 +51,8 @@ export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
     label: "Rabattkodar",
     singular: "Rabattkode",
     icon: "sell",
+    tone: "border-transparent bg-cat-discount text-on-cat-discount",
+    ink: "text-cat-discount-accent",
     codeLabel: "Rabattkode",
     dateLabel: "Gyldig til",
     titleHint: "10 % hos Zalando",
@@ -57,6 +61,8 @@ export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
     label: "Medlemskap",
     singular: "Medlemskap",
     icon: "id_card",
+    tone: "border-transparent bg-cat-membership text-on-cat-membership",
+    ink: "text-cat-membership-accent",
     codeLabel: "Medlemsnummer",
     dateLabel: "Fornyast",
     titleHint: "Fagforbundet",
@@ -65,6 +71,8 @@ export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
     label: "Forsikringar",
     singular: "Forsikring",
     icon: "shield",
+    tone: "border-transparent bg-cat-insurance text-on-cat-insurance",
+    ink: "text-cat-insurance-accent",
     codeLabel: "Polise-/avtalenummer",
     dateLabel: "Fornyast",
     titleHint: "Reiseforsikring",
@@ -73,6 +81,8 @@ export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
     label: "Ting me eig",
     singular: "Ting",
     icon: "inventory_2",
+    tone: "border-transparent bg-cat-product text-on-cat-product",
+    ink: "text-cat-product-accent",
     codeLabel: "Storleik / modell",
     dateLabel: "Garanti til",
     hasPurchaseDate: true,
@@ -82,6 +92,8 @@ export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
     label: "Kjekt å vite",
     singular: "Kjekt å vite",
     icon: "lightbulb",
+    tone: "border-transparent bg-cat-note text-on-cat-note",
+    ink: "text-cat-note-accent",
     codeLabel: "Detalj / verdi",
     dateLabel: "Dato",
     plainDate: true,

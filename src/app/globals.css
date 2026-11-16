@@ -1,52 +1,87 @@
 @import "tailwindcss";
 
-/* Material Design 3: fargeroller frå eitt grønt utgangspunkt. Lys og mørk modus følgjer systemet. */
+/* Material Design 3: fargeroller frå eit indigo utgangspunkt, amber som tertiærfarge.
+   Kvar kategori har i tillegg sin eigen harmoniserte farge (--cat-*), slik at oversikta ikkje blir einsfarga.
+   Lys og mørk modus følgjer systemet. */
 :root {
-  --primary: #006b5f;
+  --primary: #4453c4;
   --on-primary: #ffffff;
-  --primary-container: #9ef2e2;
-  --on-primary-container: #00201c;
-  --secondary-container: #cce8e2;
-  --on-secondary-container: #05201c;
+  --primary-container: #dfe0ff;
+  --on-primary-container: #000e5f;
+  --secondary-container: #dfe1f9;
+  --on-secondary-container: #171a2c;
   --tertiary-container: #ffddb3;
   --on-tertiary-container: #291800;
   --error: #ba1a1a;
   --error-container: #ffdad6;
   --on-error-container: #410002;
-  --surface: #f4fbf8;
-  --surface-container-low: #eff5f2;
-  --surface-container: #e9efec;
-  --surface-container-high: #e3eae7;
-  --surface-container-highest: #dde4e1;
-  --on-surface: #161d1b;
-  --on-surface-variant: #3f4946;
-  --outline: #6f7976;
-  --outline-variant: #bec9c5;
+  --surface: #fbf8ff;
+  --surface-container-low: #f5f2fa;
+  --surface-container: #efedf4;
+  --surface-container-high: #e9e7ef;
+  --surface-container-highest: #e4e1e9;
+  --on-surface: #1b1b21;
+  --on-surface-variant: #46464f;
+  --outline: #777680;
+  --outline-variant: #c7c5d0;
   --shadow: 0 0 0;
+
+  /* Kategorifargar: container / tekst på container / aksent (ikon på nøytral bakgrunn) */
+  --cat-discount: #ffddb3;
+  --on-cat-discount: #291800;
+  --cat-discount-accent: #855400;
+  --cat-membership: #d3e4ff;
+  --on-cat-membership: #001c38;
+  --cat-membership-accent: #1f60a5;
+  --cat-insurance: #bcf0d0;
+  --on-cat-insurance: #00210f;
+  --cat-insurance-accent: #006d43;
+  --cat-product: #eedcff;
+  --on-cat-product: #280056;
+  --cat-product-accent: #6f44b0;
+  --cat-note: #ffd9e3;
+  --on-cat-note: #3e001d;
+  --cat-note-accent: #9d3e63;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --primary: #82d5c7;
-    --on-primary: #003731;
-    --primary-container: #005047;
-    --on-primary-container: #9ef2e2;
-    --secondary-container: #334b47;
-    --on-secondary-container: #cce8e2;
-    --tertiary-container: #5e4100;
+    --primary: #bcc2ff;
+    --on-primary: #0f2194;
+    --primary-container: #2a3aab;
+    --on-primary-container: #dfe0ff;
+    --secondary-container: #43455a;
+    --on-secondary-container: #dfe1f9;
+    --tertiary-container: #624000;
     --on-tertiary-container: #ffddb3;
     --error: #ffb4ab;
     --error-container: #93000a;
     --on-error-container: #ffdad6;
-    --surface: #0e1513;
-    --surface-container-low: #161d1b;
-    --surface-container: #1a211f;
-    --surface-container-high: #252b29;
-    --surface-container-highest: #2f3634;
-    --on-surface: #dde4e1;
-    --on-surface-variant: #bec9c5;
-    --outline: #899390;
-    --outline-variant: #3f4946;
+    --surface: #131318;
+    --surface-container-low: #1b1b21;
+    --surface-container: #1f1f25;
+    --surface-container-high: #2a292f;
+    --surface-container-highest: #35343a;
+    --on-surface: #e4e1e9;
+    --on-surface-variant: #c7c5d0;
+    --outline: #918f9a;
+    --outline-variant: #46464f;
+
+    --cat-discount: #624000;
+    --on-cat-discount: #ffddb3;
+    --cat-discount-accent: #ffb95c;
+    --cat-membership: #00497d;
+    --on-cat-membership: #d3e4ff;
+    --cat-membership-accent: #a3c9ff;
+    --cat-insurance: #005231;
+    --on-cat-insurance: #bcf0d0;
+    --cat-insurance-accent: #7fdaa6;
+    --cat-product: #563a80;
+    --on-cat-product: #eedcff;
+    --cat-product-accent: #d7baff;
+    --cat-note: #7b2949;
+    --on-cat-note: #ffd9e3;
+    --cat-note-accent: #ffb0c9;
   }
 }
 
@@ -72,6 +107,21 @@
   --color-danger: var(--error);
   --color-error-container: var(--error-container);
   --color-on-error-container: var(--on-error-container);
+  --color-cat-discount: var(--cat-discount);
+  --color-on-cat-discount: var(--on-cat-discount);
+  --color-cat-discount-accent: var(--cat-discount-accent);
+  --color-cat-membership: var(--cat-membership);
+  --color-on-cat-membership: var(--on-cat-membership);
+  --color-cat-membership-accent: var(--cat-membership-accent);
+  --color-cat-insurance: var(--cat-insurance);
+  --color-on-cat-insurance: var(--on-cat-insurance);
+  --color-cat-insurance-accent: var(--cat-insurance-accent);
+  --color-cat-product: var(--cat-product);
+  --color-on-cat-product: var(--on-cat-product);
+  --color-cat-product-accent: var(--cat-product-accent);
+  --color-cat-note: var(--cat-note);
+  --color-on-cat-note: var(--on-cat-note);
+  --color-cat-note-accent: var(--cat-note-accent);
   --font-sans: var(--font-roboto);
   --font-mono: var(--font-roboto-mono);
   /* M3-høgdenivå */

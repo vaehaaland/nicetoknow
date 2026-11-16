@@ -70,7 +70,7 @@ function Proposals({ message, onChange }: { message: Message; onChange: (patch: 
       <ul className="flex flex-col divide-y divide-border">
         {drafts.map((draft, index) => (
           <li key={index} className="flex items-start gap-2 py-2 text-sm">
-            <Icon name={CATEGORIES[draft.category].icon} size={20} className="mt-0.5 text-muted" />
+            <Icon name={CATEGORIES[draft.category].icon} size={20} className={`mt-0.5 ${CATEGORIES[draft.category].ink}`} />
             <div className="min-w-0 flex-1">
               <p className="font-medium break-words">{draft.title}</p>
               {/* Dei viktigaste felta på éi linje */}

@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Rabattkodar, medlemskap, forsikringar og anna kjekt å vite.",
     start_url: "/",
     display: "standalone",
-    background_color: "#f4fbf8",
-    theme_color: "#006b5f",
+    background_color: "#fbf8ff",
+    theme_color: "#4453c4",
     icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }],
   };
 }

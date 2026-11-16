@@ -9,7 +9,7 @@ export default function AppShell({ householdName, children }: { householdName: s
       <header className="sticky top-0 z-10 bg-bg">
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between gap-4 px-4">
           <Link href="/" className="flex min-w-0 items-baseline gap-2">
-            <span className="text-[22px] leading-7">NiceToKnow</span>
+            <span className="text-[22px] leading-7 font-medium text-accent">NiceToKnow</span>
             <span className="truncate text-sm text-muted">{householdName}</span>
           </Link>
           <NavBar />

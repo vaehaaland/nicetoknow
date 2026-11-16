@@ -73,9 +73,9 @@ export function EntryForm({ entry, defaultCategory, defaultParentId, memberships
               type="button"
               onClick={() => setCategory(id)}
               aria-pressed={id === category}
-              className={`chip state-layer text-text ${id === category ? "chip-selected pl-2" : ""}`}
+              className={`chip state-layer ${id === category ? `${CATEGORIES[id].tone} pl-2` : "text-text"}`}
             >
-              <Icon name={id === category ? "check" : CATEGORIES[id].icon} size={18} className={id === category ? "" : "text-accent"} />
+              <Icon name={id === category ? "check" : CATEGORIES[id].icon} size={18} className={id === category ? "" : CATEGORIES[id].ink} />
               {CATEGORIES[id].singular}
             </button>
           ))}

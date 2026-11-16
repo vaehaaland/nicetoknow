@@ -100,12 +100,15 @@ function EntryCard({ entry, today, owner, parent, benefits, onEdit, onAddBenefit
     <li className="card flex min-w-0 flex-col gap-3 p-4">
       {/* Hovud: kategori-ikon, tittel og rediger */}
       <div className="flex items-start gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container" title={config.singular}>
+        <span className={`flex size-10 shrink-0 items-center justify-center rounded-full ${config.tone}`} title={config.singular}>
           <Icon name={config.icon} size={20} />
         </span>
         <div className="min-w-0 flex-1">
           <h3 className="text-base leading-6 font-medium break-words">{entry.title}</h3>
-          <p className="text-sm text-muted break-words">{[config.singular, entry.provider].filter(Boolean).join(" · ")}</p>
+          <p className="text-sm text-muted break-words">
+            <span className={`font-medium ${config.ink}`}>{config.singular}</span>
+            {entry.provider && ` · ${entry.provider}`}
+          </p>
         </div>
         <button onClick={onEdit} aria-label={`Rediger ${entry.title}`} title="Rediger" className="btn-icon -mt-1 -mr-2">
           <Icon name="edit" size={20} />
@@ -135,7 +138,7 @@ function EntryCard({ entry, today, owner, parent, benefits, onEdit, onAddBenefit
           </div>
           {benefits.map((benefit) => (
             <button key={benefit.id} onClick={() => onShow(benefit.title)} className="state-layer flex min-h-10 items-center gap-3 px-4 text-left text-sm">
-              <Icon name={CATEGORIES[benefit.category].icon} size={18} className="text-muted" />
+              <Icon name={CATEGORIES[benefit.category].icon} size={18} className={CATEGORIES[benefit.category].ink} />
               <span className="min-w-0 truncate">
                 {benefit.title}
                 {benefit.provider && <span className="text-muted"> · {benefit.provider}</span>}
@@ -213,9 +216,10 @@ export function EntryBrowser({ entries, members, currentUserId, today }: Props) 
     window.scrollTo({ top: 0 });
   };
 
-  const filters: { id: Filter; label: string; icon?: IconName }[] = [
-    { id: "all", label: "Alle" },
-    ...CATEGORY_IDS.map((id) => ({ id, label: CATEGORIES[id].label, icon: CATEGORIES[id].icon })),
+  // «Alle» brukar den nøytrale chip-fargen; kategoriane brukar sin eigen farge
+  const filters: { id: Filter; label: string; icon?: IconName; tone: string; ink?: string }[] = [
+    { id: "all", label: "Alle", tone: "chip-selected" },
+    ...CATEGORY_IDS.map((id) => ({ id, ...CATEGORIES[id] })),
   ];
 
   return (
@@ -240,15 +244,15 @@ export function EntryBrowser({ entries, members, currentUserId, today }: Props) 
 
       {/* Filter-chips, horisontalt rullbare på mobil */}
       <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
-        {filters.map(({ id, label, icon }) => (
+        {filters.map(({ id, label, icon, tone, ink }) => (
           <button
             key={id}
             onClick={() => setFilter(id)}
             aria-pressed={filter === id}
-            className={`chip state-layer text-text ${filter === id ? "chip-selected pl-2" : ""}`}
+            className={`chip state-layer ${filter === id ? `${tone} pl-2` : "text-text"}`}
           >
             {/* Vald chip får hake framfor, slik M3 filter chips gjer */}
-            {filter === id ? <Icon name="check" size={18} /> : icon && <Icon name={icon} size={18} className="text-accent" />}
+            {filter === id ? <Icon name="check" size={18} /> : icon && <Icon name={icon} size={18} className={ink} />}
             {label}
           </button>
         ))}
