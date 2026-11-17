@@ -2,19 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { IconName } from "@/lib/icons";
+import { Icon } from "./Icon";
 
-const LINKS = [
-  { href: "/", label: "Oversikt", icon: "🗂️" },
-  { href: "/chat", label: "Spør Claude", icon: "✨" },
-  { href: "/innstillingar", label: "Innstillingar", icon: "⚙️" },
+const LINKS: { href: string; label: string; icon: IconName }[] = [
+  { href: "/", label: "Oversikt", icon: "dashboard" },
+  { href: "/chat", label: "Spør Claude", icon: "wand_stars" },
+  { href: "/innstillingar", label: "Innstillingar", icon: "settings" },
 ];
 
-// Botn-fane på mobil, vanleg toppmeny frå sm og opp
+// M3 navigation bar nedst på mobil; frå sm og opp ligg lenkjene i topplinja
 export function NavBar() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur sm:static sm:border-0 sm:bg-transparent sm:pb-0">
+    <nav className="fixed inset-x-0 bottom-0 z-20 bg-container pb-[env(safe-area-inset-bottom)] sm:static sm:bg-transparent sm:pb-0">
       <ul className="mx-auto flex max-w-3xl sm:gap-1">
         {LINKS.map(({ href, label, icon }) => {
           const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -23,11 +25,18 @@ export function NavBar() {
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-14 flex-col items-center justify-center gap-0.5 text-xs font-medium sm:min-h-10 sm:flex-row sm:gap-1.5 sm:rounded-xl sm:px-3 sm:text-sm ${
-                  active ? "text-accent sm:bg-surface" : "text-muted hover:text-text"
+                className={`group flex h-20 flex-col items-center justify-center gap-1 text-xs font-medium sm:h-10 sm:flex-row sm:gap-2 sm:rounded-full sm:px-4 sm:text-sm ${
+                  active ? "text-text sm:bg-secondary-container sm:text-on-secondary-container" : "text-muted"
                 }`}
               >
-                <span aria-hidden className="text-lg sm:text-base">{icon}</span>
+                {/* Aktiv-indikatoren: pille bak ikonet (berre på mobil) */}
+                <span
+                  className={`flex h-8 w-16 items-center justify-center rounded-full transition-colors sm:h-auto sm:w-auto sm:bg-transparent ${
+                    active ? "bg-secondary-container text-on-secondary-container" : "group-hover:bg-text/8"
+                  }`}
+                >
+                  <Icon name={icon} />
+                </span>
                 {label}
               </Link>
             </li>

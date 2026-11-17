@@ -21,7 +21,7 @@ async function Onboarding({ searchParams }: Pick<PageProps<"/onboarding">, "sear
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-5 px-5 py-10">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Velkomen!</h1>
+        <h1 className="text-[28px] leading-9">Velkomen!</h1>
         <p className="text-muted">
           Alt de lagrar blir delt i ein husstand. Opprett ein ny, eller bli med i partnaren sin.
         </p>
@@ -30,13 +30,13 @@ async function Onboarding({ searchParams }: Pick<PageProps<"/onboarding">, "sear
       {typeof error === "string" && <p className="text-sm text-danger">{error}</p>}
 
       <form action={createHousehold} className="card flex flex-col gap-3 p-5">
-        <h2 className="font-semibold">Opprett ny husstand</h2>
+        <h2 className="text-base font-medium">Opprett ny husstand</h2>
         <input className="field" name="name" placeholder="Namn, t.d. «Heime»" maxLength={80} />
         <button className="btn-primary">Opprett</button>
       </form>
 
       <form action={joinHousehold} className="card flex flex-col gap-3 p-5">
-        <h2 className="font-semibold">Bli med via invitasjonskode</h2>
+        <h2 className="text-base font-medium">Bli med via invitasjonskode</h2>
         <input className="field font-mono" name="code" placeholder="Kode frå partnaren" required autoCapitalize="none" autoCorrect="off" />
         <button className="btn-ghost">Bli med</button>
       </form>

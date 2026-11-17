@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { Icon } from "./Icon";
 
-// Kopierer ein verdi til utklippstavla og gir ei kort kvittering
+// Ikonknapp som kopierer ein verdi til utklippstavla og gir ei kort kvittering
 export function CopyButton({ value, label = "Kopier" }: { value: string; label?: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -13,8 +14,8 @@ export function CopyButton({ value, label = "Kopier" }: { value: string; label?:
   }
 
   return (
-    <button type="button" onClick={copy} className="btn-ghost min-h-9 shrink-0 px-3 text-xs">
-      {copied ? "Kopiert ✓" : label}
+    <button type="button" onClick={copy} aria-label={copied ? "Kopiert" : label} title={label} className="btn-icon">
+      <Icon name={copied ? "check" : "content_copy"} size={20} />
     </button>
   );
 }
